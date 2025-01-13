@@ -32,6 +32,11 @@ type UserActivityList []struct {
 	UserActivity
 }
 
+var CsrfCookieDefault = http.Cookie{
+	Name:  "scratchcsrftoken",
+	Value: "a",
+}
+
 // Struct functions
 
 func (s Session) GetWhatsHappening() *UserActivityList {

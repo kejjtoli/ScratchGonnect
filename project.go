@@ -3,7 +3,6 @@ package scratchgonnect
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -58,13 +57,6 @@ type json_comment struct {
 	Id       string `json:"commentee_id"`
 }
 
-// Defaults
-
-var csrfCookie = http.Cookie{
-	Name:  "scratchcsrftoken",
-	Value: "a",
-}
-
 // Struct functions
 
 func (project Project) SetProject(session Session, title string, instructions string, description string) {
@@ -84,11 +76,9 @@ func (project Project) SetProject(session Session, title string, instructions st
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		panic(err)
+	if err != nil || resp.StatusCode != 200 {
+		panic("Set project failed! http response:" + to_string(resp.StatusCode))
 	}
-
-	fmt.Println(resp)
 }
 
 func (project Project) PostComment(session Session, content string, parent_id string, commentee_id string) {
@@ -110,11 +100,11 @@ func (project Project) PostComment(session Session, content string, parent_id st
 	req.Header.Set("Content-Type", "application/json")
 
 	req.AddCookie(&session.Cookie)
-	req.AddCookie(&csrfCookie)
+	req.AddCookie(&CsrfCookieDefault)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp.StatusCode != 200 {
-		panic("Post comment failed!")
+		panic("Post comment failed! http response:" + to_string(resp.StatusCode))
 	}
 }
 

@@ -1,6 +1,7 @@
 package scratchgonnect
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 )
@@ -57,7 +58,68 @@ func (u User) GetFollowing() *UserArray {
 	return decoded
 }
 
+func (u User) Follow(session Session) {
+	resp, err := change_follow_request(u, session, "add")
+
+	if err != nil || resp.StatusCode != 200 {
+		panic("Follower action failed! http response:" + to_string(resp.StatusCode))
+	}
+}
+
+func (u User) Unfollow(session Session) {
+	resp, err := change_follow_request(u, session, "remove")
+
+	if err != nil || resp.StatusCode != 200 {
+		panic("Follower action failed! http response:" + to_string(resp.StatusCode))
+	}
+}
+
+func (u User) PostComment(session Session, content string, parent_id string, commentee_id string) {
+	b, _ := json.Marshal(json_comment{
+		Content:  content,
+		ParentId: parent_id,
+		Id:       commentee_id,
+	})
+
+	req, err := http.NewRequest("POST", "https://scratch.mit.edu/site-api/comments/user/"+u.Username+"/add/", bytes.NewBuffer(b))
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header = session.HttpHeader
+
+	req.Header.Set("accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+
+	req.AddCookie(&session.Cookie)
+	req.AddCookie(&CsrfCookieDefault)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		panic("Post comment failed! http response:" + to_string(resp.StatusCode))
+	}
+}
+
 // Functions
+
+func change_follow_request(u User, session Session, request string) (*http.Response, error) {
+	payload := `{"id":"` + u.Username + `","userId":` + to_string(u.Id) + `,"username":"` + u.Username + `","thumbnail_url":"//uploads.scratch.mit.edu/users/avatars/` + to_string(u.Id) + `.png"}`
+
+	req, err := http.NewRequest("PUT", "https://scratch.mit.edu/site-api/users/followers/"+u.Username+"/"+request+"/?usernames="+session.Username, bytes.NewBuffer([]byte(payload)))
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header = session.HttpHeader
+
+	req.Header.Set("accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+
+	req.AddCookie(&session.Cookie)
+	req.AddCookie(&CsrfCookieDefault)
+
+	return http.DefaultClient.Do(req)
+}
 
 func GetUser(username string) *User {
 	resp, err := http.Get("https://api.scratch.mit.edu/users/" + username)
