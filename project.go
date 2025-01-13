@@ -3,6 +3,7 @@ package scratchgonnect
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -51,6 +52,19 @@ type put_http struct {
 	Description  string `json:"description"`
 }
 
+type json_comment struct {
+	Content  string `json:"content"`
+	ParentId string `json:"parent_id"`
+	Id       string `json:"commentee_id"`
+}
+
+// Defaults
+
+var csrfCookie = http.Cookie{
+	Name:  "scratchcsrftoken",
+	Value: "a",
+}
+
 // Struct functions
 
 func (project Project) SetProject(session Session, title string, instructions string, description string) {
@@ -69,9 +83,38 @@ func (project Project) SetProject(session Session, title string, instructions st
 
 	req.Header.Add("Content-Type", "application/json")
 
-	_, err = http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
+	}
+
+	fmt.Println(resp)
+}
+
+func (project Project) PostComment(session Session, content string, parent_id string, commentee_id string) {
+	b, _ := json.Marshal(json_comment{
+		Content:  content,
+		ParentId: parent_id,
+		Id:       commentee_id,
+	})
+
+	req, err := http.NewRequest("POST", "https://api.scratch.mit.edu/proxy/comments/project/"+to_string(project.Id), bytes.NewBuffer(b))
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header = session.HttpHeader
+
+	req.Header.Set("referer", "https://scratch.mit.edu/projects/"+to_string(project.Id)+"/")
+	req.Header.Set("accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+
+	req.AddCookie(&session.Cookie)
+	req.AddCookie(&csrfCookie)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		panic("Post comment failed!")
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // Structs
@@ -12,8 +13,9 @@ import (
 type Session struct {
 	Username   string
 	Token      string
-	Cookie     []string
+	Cookie     http.Cookie
 	HttpHeader http.Header
+	SessionId  string
 }
 
 type UserActivity struct {
@@ -67,7 +69,7 @@ func NewSession(username string, password string) *Session {
 	req.Header.Add("user-agent", "(KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36")
 	req.Header.Add("x-csrftoken", "a")
 	req.Header.Add("x-requested-with", "XMLHttpRequest")
-	req.Header.Add("referer", "https://scratch.mit.edu")
+	req.Header.Add("referer", "https://scratch.mit.edu/")
 	req.Header.Add("Cookie", "scratchcsrftoken=a;scratchlanguage=en;")
 
 	resp, err := http.DefaultClient.Do(req)
@@ -82,22 +84,24 @@ func NewSession(username string, password string) *Session {
 
 	defHeader := http.Header{}
 
-	defHeader.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-	defHeader.Add("user-agent", "(KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36")
-	defHeader.Add("x-csrftoken", "a")
+	defHeader.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36")
 	defHeader.Add("x-requested-with", "XMLHttpRequest")
-	defHeader.Add("referer", "https://scratch.mit.edu")
+	defHeader.Add("x-csrftoken", "a")
+	defHeader.Add("referer", "https://scratch.mit.edu/")
 	defHeader.Add("X-Token", newToken[0].Token)
 
-	defHeader.Add("Cookie", resp.Header["Set-Cookie"][0])
-	defHeader.Add("Cookie", resp.Header["Set-Cookie"][1])
+	ses_id := strings.Split(resp.Header["Set-Cookie"][0], `"`)[1]
 
-	// Create new session
+	// Generate cookie form response
 
 	newSession := Session{
-		Token:      newToken[0].Token,
-		Username:   username,
-		Cookie:     resp.Header["Set-Cookie"],
+		Token:     newToken[0].Token,
+		SessionId: ses_id,
+		Username:  username,
+		Cookie: http.Cookie{
+			Name:  "scratchsessionsid",
+			Value: ses_id,
+		},
 		HttpHeader: defHeader,
 	}
 
