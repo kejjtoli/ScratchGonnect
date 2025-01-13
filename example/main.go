@@ -13,7 +13,7 @@ func main() {
 	//fmt.Println(curators)
 
 	//newProject := get_project("23728")
-	//fmt.Println(newProject.Name
+	//fmt.Println(newProject.
 
 	//go run ./example
 
