@@ -4,7 +4,7 @@ import scratchgonnect "github.com/kejjtoli/ScratchGonnect"
 
 func start() {
 	// Log into scratch account (required for some functions)
-	session := scratchgonnect.NewSession("bob_budowlaniec", "bobbudulec")
+	session := scratchgonnect.NewSession("username", "pass")
 
 	// User structure
 	user := scratchgonnect.GetUser("kajtolmation")
