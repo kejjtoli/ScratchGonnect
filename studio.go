@@ -2,6 +2,7 @@ package scratchgonnect
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 )
 
@@ -57,7 +58,40 @@ func (s Studio) GetManagers() *UserArray {
 	return decoded
 }
 
+func (studio Studio) Follow(session Session) {
+	resp, err := change_follow_request_studio(studio, session, "add")
+
+	if err != nil || resp.StatusCode != 200 {
+		panic("Follower action failed! http response:" + to_string(resp.StatusCode))
+	}
+}
+
+func (studio Studio) Unfollow(session Session) {
+	resp, err := change_follow_request_studio(studio, session, "remove")
+
+	if err != nil || resp.StatusCode != 200 {
+		panic("Follower action failed! http response:" + to_string(resp.StatusCode))
+	}
+}
+
 // Functions
+
+func change_follow_request_studio(s Studio, session Session, request string) (*http.Response, error) {
+	req, err := http.NewRequest("PUT", "https://scratch.mit.edu/site-api/users/bookmarkers/"+to_string(s.Id)+"/"+request+"/?usernames="+session.Username, *new(io.Reader))
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header = session.HttpHeader
+
+	req.Header.Set("accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+
+	req.AddCookie(&session.Cookie)
+	req.AddCookie(&CsrfCookieDefault)
+
+	return http.DefaultClient.Do(req)
+}
 
 func GetStudio(studio string) *Studio {
 	resp, err := http.Get("https://api.scratch.mit.edu/studios/" + studio)
