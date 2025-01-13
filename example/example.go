@@ -1,6 +1,6 @@
 package main
 
-import "scratchgonnect"
+import scratchgonnect "github.com/kejjtoli/ScratchGonnect"
 
 func start() {
 	// Log into scratch account (required for some functions)
