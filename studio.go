@@ -88,7 +88,7 @@ func change_follow_request_studio(s Studio, session Session, request string) (*h
 	req.Header.Set("Content-Type", "application/json")
 
 	req.AddCookie(&session.Cookie)
-	req.AddCookie(&CsrfCookieDefault)
+	req.AddCookie(&csrfCookieDefault)
 
 	return http.DefaultClient.Do(req)
 }

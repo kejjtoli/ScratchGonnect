@@ -92,7 +92,7 @@ func (u User) PostComment(session Session, content string, parent_id string, com
 	req.Header.Set("Content-Type", "application/json")
 
 	req.AddCookie(&session.Cookie)
-	req.AddCookie(&CsrfCookieDefault)
+	req.AddCookie(&csrfCookieDefault)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp.StatusCode != 200 {
@@ -116,7 +116,7 @@ func change_follow_request(u User, session Session, request string) (*http.Respo
 	req.Header.Set("Content-Type", "application/json")
 
 	req.AddCookie(&session.Cookie)
-	req.AddCookie(&CsrfCookieDefault)
+	req.AddCookie(&csrfCookieDefault)
 
 	return http.DefaultClient.Do(req)
 }

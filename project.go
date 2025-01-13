@@ -100,7 +100,7 @@ func (project Project) PostComment(session Session, content string, parent_id st
 	req.Header.Set("Content-Type", "application/json")
 
 	req.AddCookie(&session.Cookie)
-	req.AddCookie(&CsrfCookieDefault)
+	req.AddCookie(&csrfCookieDefault)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp.StatusCode != 200 {

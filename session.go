@@ -32,7 +32,7 @@ type UserActivityList []struct {
 	UserActivity
 }
 
-var CsrfCookieDefault = http.Cookie{
+var csrfCookieDefault = http.Cookie{
 	Name:  "scratchcsrftoken",
 	Value: "a",
 }
@@ -56,7 +56,7 @@ func (s Session) GetWhatsHappening() *UserActivityList {
 }
 
 func NewSession(username string, password string) *Session {
-	post := JSONPostLogin{
+	post := jSONPostLogin{
 		Username: username,
 		Password: password,
 	}
@@ -78,8 +78,8 @@ func NewSession(username string, password string) *Session {
 	req.Header.Add("Cookie", "scratchcsrftoken=a;scratchlanguage=en;")
 
 	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		panic(err)
+	if err != nil || resp.StatusCode != 200 {
+		panic("Session creation failed! http response:" + to_string(resp.StatusCode))
 	}
 
 	newToken := new(TokenDelivery)

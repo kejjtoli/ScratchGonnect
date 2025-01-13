@@ -6,7 +6,7 @@ import (
 
 // Base structs
 
-type JSONPostLogin struct {
+type jSONPostLogin struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
