@@ -3,6 +3,7 @@ package scratchgonnect
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 )
 
@@ -108,7 +109,56 @@ func (project Project) PostComment(session Session, content string, parent_id st
 	}
 }
 
+func (p Project) Love(session Session) {
+	resp, err := request_project_post(p, session, "loves", "POST")
+
+	if err != nil || resp.StatusCode != 200 {
+		panic("Love project failed! http response:" + to_string(resp.StatusCode))
+	}
+}
+
+func (p Project) Favorite(session Session) {
+	resp, err := request_project_post(p, session, "favorites", "POST")
+
+	if err != nil || resp.StatusCode != 200 {
+		panic("Fav project failed! http response:" + to_string(resp.StatusCode))
+	}
+}
+
+func (p Project) Unlove(session Session) {
+	resp, err := request_project_post(p, session, "loves", "DELETE")
+
+	if err != nil || resp.StatusCode != 200 {
+		panic("Unlove project failed! http response:" + to_string(resp.StatusCode))
+	}
+}
+
+func (p Project) Unfavorite(session Session) {
+	resp, err := request_project_post(p, session, "favorites", "DELETE")
+
+	if err != nil || resp.StatusCode != 200 {
+		panic("Unfav project failed! http response:" + to_string(resp.StatusCode))
+	}
+}
+
 // Functions
+
+func request_project_post(p Project, session Session, request string, rq string) (*http.Response, error) {
+	req, err := http.NewRequest(rq, "https://api.scratch.mit.edu/proxy/projects/"+to_string(p.Id)+"/"+request+"/user/"+session.Username, *new(io.Reader))
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header = session.HttpHeader
+
+	req.Header.Set("accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+
+	req.AddCookie(&session.Cookie)
+	req.AddCookie(&csrfCookieDefault)
+
+	return http.DefaultClient.Do(req)
+}
 
 func GetProject(project string) *Project {
 	resp, err := http.Get("https://api.scratch.mit.edu/projects/" + project)
