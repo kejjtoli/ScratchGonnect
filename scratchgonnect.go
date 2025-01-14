@@ -19,6 +19,10 @@ type UserArray []struct {
 	User
 }
 
+type ProjectArray []struct {
+	Project
+}
+
 // Functions
 
 func to_string(v int) string {

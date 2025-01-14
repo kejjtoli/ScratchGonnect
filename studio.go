@@ -32,28 +32,28 @@ type Studio struct {
 
 // Struct functions
 
-func (s Studio) GetCurators() *UserArray {
+func (s Studio) GetCurators() UserArray {
 	resp, err := http.Get("https://api.scratch.mit.edu/studios/" + to_string(s.Id) + "/curators")
 	if err != nil {
 		panic(err)
 	}
 
-	decoded := new(UserArray)
+	decoded := UserArray{}
 
-	json.NewDecoder(resp.Body).Decode(decoded)
+	json.NewDecoder(resp.Body).Decode(&decoded)
 
 	return decoded
 }
 
-func (s Studio) GetManagers() *UserArray {
+func (s Studio) GetManagers() UserArray {
 	resp, err := http.Get("https://api.scratch.mit.edu/studios/" + to_string(s.Id) + "/managers")
 	if err != nil {
 		panic(err)
 	}
 
-	decoded := new(UserArray)
+	decoded := UserArray{}
 
-	json.NewDecoder(resp.Body).Decode(decoded)
+	json.NewDecoder(resp.Body).Decode(&decoded)
 
 	return decoded
 }

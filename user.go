@@ -32,28 +32,41 @@ type User struct {
 
 // Struct functions
 
-func (u User) GetFollowers() *UserArray {
+func (u User) GetFollowers() UserArray {
 	resp, err := http.Get("https://api.scratch.mit.edu/users/" + u.Username + "/followers")
 	if err != nil {
 		panic(err)
 	}
 
-	decoded := new(UserArray)
+	decoded := UserArray{}
 
-	json.NewDecoder(resp.Body).Decode(decoded)
+	json.NewDecoder(resp.Body).Decode(&decoded)
 
 	return decoded
 }
 
-func (u User) GetFollowing() *UserArray {
+func (u User) GetFollowing() UserArray {
 	resp, err := http.Get("https://api.scratch.mit.edu/users/" + u.Username + "/following")
 	if err != nil {
 		panic(err)
 	}
 
-	decoded := new(UserArray)
+	decoded := UserArray{}
 
-	json.NewDecoder(resp.Body).Decode(decoded)
+	json.NewDecoder(resp.Body).Decode(&decoded)
+
+	return decoded
+}
+
+func (u User) GetProjects() ProjectArray {
+	resp, err := http.Get("https://api.scratch.mit.edu/users/" + u.Username + "/projects")
+	if err != nil || resp.StatusCode != 200 {
+		panic("Get projects action failed! http response:" + to_string(resp.StatusCode))
+	}
+
+	decoded := ProjectArray{}
+
+	json.NewDecoder(resp.Body).Decode(&decoded)
 
 	return decoded
 }
