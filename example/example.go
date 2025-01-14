@@ -29,6 +29,7 @@ func start() {
 	studio.AddProject(*session, 535962801)      // Adds project to studio
 	studio.RemoveProject(*session, 535962801)   // Removes project from studio
 	studio.InviteUser(*session, "kajtolmation") // Invites user to studio
+	studio.GetComments(0, 20)                   // Returns list of comments
 
 	// Project structure
 	project := scratchgonnect.GetProject("535962801")
