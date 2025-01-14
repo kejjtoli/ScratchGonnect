@@ -11,7 +11,7 @@ ScratchGonnect is a Scratch API wrapper written in Go and allows you to easily a
 
 **Run this command in your terminal in order to use this package**
 ```
-go get github.com/kejjtoli/ScratchGonnect@V0.0.0
+go get github.com/kejjtoli/ScratchGonnect@latest
 ```
 
 ## Examples
