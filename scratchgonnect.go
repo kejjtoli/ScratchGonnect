@@ -15,12 +15,15 @@ type TokenDelivery [1]struct {
 	Token string `json:"token"`
 }
 
-type UserArray []struct {
-	User
+type project_partial struct {
+	Username  string `json:"username"`
+	Id        int    `json:"id"`
+	CreatorId int    `json:"creator_id"`
+	Title     string `json:"title"`
 }
 
-type ProjectArray []struct {
-	Project
+type json_msgs struct {
+	Count int `json:"count"`
 }
 
 // Functions

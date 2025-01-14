@@ -32,43 +32,56 @@ type User struct {
 
 // Struct functions
 
-func (u User) GetFollowers() UserArray {
+func (u User) GetFollowers() []User {
 	resp, err := http.Get("https://api.scratch.mit.edu/users/" + u.Username + "/followers")
 	if err != nil {
 		panic(err)
 	}
 
-	decoded := UserArray{}
+	decoded := []User{}
 
 	json.NewDecoder(resp.Body).Decode(&decoded)
 
 	return decoded
 }
 
-func (u User) GetFollowing() UserArray {
+func (u User) GetFollowing() []User {
 	resp, err := http.Get("https://api.scratch.mit.edu/users/" + u.Username + "/following")
 	if err != nil {
 		panic(err)
 	}
 
-	decoded := UserArray{}
+	decoded := []User{}
 
 	json.NewDecoder(resp.Body).Decode(&decoded)
 
 	return decoded
 }
 
-func (u User) GetProjects() ProjectArray {
+func (u User) GetProjects() []Project {
 	resp, err := http.Get("https://api.scratch.mit.edu/users/" + u.Username + "/projects")
 	if err != nil || resp.StatusCode != 200 {
 		panic("Get projects action failed! http response:" + to_string(resp.StatusCode))
 	}
 
-	decoded := ProjectArray{}
+	decoded := []Project{}
 
 	json.NewDecoder(resp.Body).Decode(&decoded)
 
 	return decoded
+}
+
+func (u User) GetUnreadMessageCount() int {
+	resp, err := http.Get("https://api.scratch.mit.edu/users/" + u.Username + "/messages/count")
+	if err != nil || resp.StatusCode != 200 {
+		panic("Get projects action failed! http response:" + to_string(resp.StatusCode))
+	}
+
+	decoded := json_msgs{}
+
+	json.NewDecoder(resp.Body).Decode(&decoded)
+
+	return decoded.Count
 }
 
 func (u User) Follow(session Session) {

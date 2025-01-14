@@ -28,10 +28,6 @@ type UserActivity struct {
 	Type        string `json:"type"`
 }
 
-type UserActivityList []struct {
-	UserActivity
-}
-
 var csrfCookieDefault = http.Cookie{
 	Name:  "scratchcsrftoken",
 	Value: "a",
@@ -39,7 +35,7 @@ var csrfCookieDefault = http.Cookie{
 
 // Struct functions
 
-func (s Session) GetWhatsHappening() *UserActivityList {
+func (s Session) GetWhatsHappening() []UserActivity {
 	req, err := http.NewRequest("GET", "https://api.scratch.mit.edu/users/"+s.Username+"/following/users/activity", *new(io.Reader))
 	if err != nil {
 		panic(err)
@@ -49,8 +45,9 @@ func (s Session) GetWhatsHappening() *UserActivityList {
 
 	resp, _ := http.DefaultClient.Do(req)
 
-	decoded := new(UserActivityList)
-	json.NewDecoder(resp.Body).Decode(decoded)
+	decoded := []UserActivity{}
+
+	json.NewDecoder(resp.Body).Decode(&decoded)
 
 	return decoded
 }

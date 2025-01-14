@@ -24,8 +24,11 @@ func start() {
 
 	// Authentication required
 
-	studio.Follow(*session)   // Follows studio
-	studio.Unfollow(*session) // Unfollows studio
+	studio.Follow(*session)                     // Follows studio
+	studio.Unfollow(*session)                   // Unfollows studio
+	studio.AddProject(*session, 535962801)      // Adds project to studio
+	studio.RemoveProject(*session, 535962801)   // Removes project from studio
+	studio.InviteUser(*session, "kajtolmation") // Invites user to studio
 
 	// Project structure
 	project := scratchgonnect.GetProject("535962801")
