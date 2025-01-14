@@ -38,4 +38,8 @@ func start() {
 
 	project.SetProject(*session, "title", "", "")    // Sets project data
 	project.PostComment(*session, "content", "", "") // Posts comment under project
+	project.Love(*session)
+	project.Favorite(*session)
+	project.Unlove(*session)
+	project.Unfavorite(*session)
 }
