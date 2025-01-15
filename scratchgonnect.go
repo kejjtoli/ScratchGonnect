@@ -20,6 +20,10 @@ type project_partial struct {
 	Id        int    `json:"id"`
 	CreatorId int    `json:"creator_id"`
 	Title     string `json:"title"`
+	History   struct {
+		CreatedDate  string `json:"created"`
+		ModifiedDate string `json:"modified"`
+	} `json:"history"`
 }
 
 type json_msgs struct {

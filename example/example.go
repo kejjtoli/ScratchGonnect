@@ -33,6 +33,7 @@ func start() {
 
 	// Project structure
 	project := scratchgonnect.GetProject("535962801")
+	project.GetRemixes()
 
 	// Authentication required
 
@@ -42,4 +43,7 @@ func start() {
 	project.Favorite(*session)
 	project.Unlove(*session)
 	project.Unfavorite(*session)
+
+	// Explore page
+	scratchgonnect.GetExploreStudios("trending", "en") // Returns list of studios
 }

@@ -141,6 +141,19 @@ func (p Project) Unfavorite(session Session) {
 	}
 }
 
+func (p Project) GetRemixes() []Project {
+	resp, err := http.Get("https://api.scratch.mit.edu/projects/" + to_string(p.Id) + "/remixes")
+	if err != nil || resp.StatusCode != 200 {
+		panic("Get remixes action failed! http response:" + to_string(resp.StatusCode))
+	}
+
+	decoded := []Project{}
+
+	json.NewDecoder(resp.Body).Decode(&decoded)
+
+	return decoded
+}
+
 // Functions
 
 func request_project_post(p Project, session Session, request string, rq string) (*http.Response, error) {
