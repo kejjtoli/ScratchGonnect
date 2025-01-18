@@ -53,11 +53,11 @@ func start() {
 
 	// Cloud (Turbowarp)
 	cloud := scratchgonnect.ConnectTurbowarpCloud("username", "1121839236") // Connects to turbowarp websocket and performs handshake
-	cloud.SetVariable("t1", 314)
-	cloud.DisconnectCloud()
-	cloud.Listen(cloud_listener)
+	cloud.SetVariable("t1", 314)                                            // Sets cloud variable to value
+	cloud.DisconnectCloud()                                                 // Disconnet from websocket
+	cloud.Listen(cloud_listener)                                            // Listen for cloud messages
 }
 
-func cloud_listener(variable_name string, value int) {
+func cloud_listener(connection *scratchgonnect.CloudSocket, variable_name string, value int) {
 	fmt.Println(variable_name, value)
 }
