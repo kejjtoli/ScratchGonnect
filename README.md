@@ -40,6 +40,26 @@ user.Follow(*session)
 // Get array of user objects
 followers := user.GetFollowers()
 ```
+**Connecting to Turbowarp cloud**
+```go
+// Connect to turbowarp websocket
+cloud := scratchgonnect.ConnectTurbowarpCloud("username", "1121839236")
+```
+Setting a cloud variable
+```go
+// Sets the value of a cloud variable
+cloud.SetVariable("t1", 314)
+```
+Listening to cloud variable changes
+```go
+// Listens to all set variable messages
+cloud.Listen(cloud_listener)
+
+// Prints out name and new value of changed variable
+func cloud_listener(variable_name string, value int) {
+	fmt.Println(variable_name, value)
+}
+```
 
 *More examples in examples/example.go file*
 
