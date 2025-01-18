@@ -29,6 +29,7 @@ type CloudSocket struct {
 	Connection *websocket.Conn
 	ProjectId  string
 	Variables  []CloudVariable
+	Username   string
 }
 
 type CloudVariable struct {
@@ -42,7 +43,7 @@ var default_timeout time.Duration = 5000000000
 
 // Struct functions
 
-func ConnectTurbowarpCloud(s Session, project_id string) *CloudSocket {
+func ConnectTurbowarpCloud(username string, project_id string) *CloudSocket {
 	header := http.Header{}
 	//header.Add("Cookie", "scratchsessionsid="+s.SessionId+";")
 	header.Set("Origin", "https://turbowarp.org")
@@ -57,13 +58,14 @@ func ConnectTurbowarpCloud(s Session, project_id string) *CloudSocket {
 	new_socket := CloudSocket{
 		Connection: c,
 		ProjectId:  project_id,
+		Username:   username,
 	}
 
 	c.SetWriteDeadline(time.Now().Add(default_timeout))
 
 	err = c.WriteJSON(handshake_cloud{
 		Method:    "handshake",
-		Username:  s.Username,
+		Username:  username,
 		ProjectId: project_id,
 	})
 	if err != nil {
@@ -101,10 +103,10 @@ func (c CloudSocket) DisconnectCloud() {
 	c.Connection.Close()
 }
 
-func (c CloudSocket) SetVariable(s Session, varname string, value int) {
+func (c CloudSocket) SetVariable(varname string, value int) {
 	err := c.Connection.WriteJSON(set_cloud{
 		Method:    "set",
-		Username:  s.Username,
+		Username:  c.Username,
 		ProjectId: c.ProjectId,
 		Name:      "☁ " + varname,
 		Value:     value,

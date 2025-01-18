@@ -1,6 +1,10 @@
 package main
 
-import scratchgonnect "github.com/kejjtoli/ScratchGonnect"
+import (
+	"fmt"
+
+	scratchgonnect "github.com/kejjtoli/ScratchGonnect"
+)
 
 func start() {
 	// Log into scratch account (required for some functions)
@@ -46,4 +50,14 @@ func start() {
 
 	// Explore page
 	scratchgonnect.GetExploreStudios("trending", "en") // Returns list of studios
+
+	// Cloud (Turbowarp)
+	cloud := scratchgonnect.ConnectTurbowarpCloud("username", "1121839236") // Connects to turbowarp websocket and performs handshake
+	cloud.SetVariable("t1", 314)
+	cloud.DisconnectCloud()
+	cloud.Listen(cloud_listener)
+}
+
+func cloud_listener(variable_name string, value int) {
+	fmt.Println(variable_name, value)
 }
