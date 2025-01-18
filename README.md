@@ -56,7 +56,7 @@ Listening to cloud variable changes
 cloud.Listen(cloud_listener)
 
 // Prints out name and new value of changed variable
-func cloud_listener(variable_name string, value int) {
+func cloud_listener(connection *scratchgonnect.CloudSocket, variable_name string, value int) {
 	fmt.Println(variable_name, value)
 }
 ```
