@@ -36,11 +36,13 @@ type CloudVariable struct {
 	Value int
 }
 
+type fn func(string, int)
+
 var default_timeout time.Duration = 5000000000
 
 // Struct functions
 
-func ConnectHandshake(s Session, project_id string) *CloudSocket {
+func ConnectTurbowarpCloud(s Session, project_id string) *CloudSocket {
 	header := http.Header{}
 	//header.Add("Cookie", "scratchsessionsid="+s.SessionId+";")
 	header.Set("Origin", "https://turbowarp.org")
@@ -92,9 +94,11 @@ func ConnectHandshake(s Session, project_id string) *CloudSocket {
 		}
 	}
 
-	//c.Close()
-
 	return &new_socket
+}
+
+func (c CloudSocket) DisconnectCloud() {
+	c.Connection.Close()
 }
 
 func (c CloudSocket) SetVariable(s Session, varname string, value int) {
@@ -109,9 +113,50 @@ func (c CloudSocket) SetVariable(s Session, varname string, value int) {
 		panic(err)
 	}
 
+	for i, variable := range c.Variables {
+		if variable.Name == "☁ "+varname {
+			c.Variables[i].Value = value
+			break
+		}
+	}
+}
+
+func (c CloudSocket) GetVariable(varname string) int {
 	for _, variable := range c.Variables {
 		if variable.Name == "☁ "+varname {
-			variable.Value = value
+			return variable.Value
+		}
+	}
+
+	panic("Couldn't find variable!")
+}
+
+func (c CloudSocket) Listen(f fn) {
+	for {
+		c.Connection.SetReadDeadline(time.Time{})
+
+		_, p, err := c.Connection.ReadMessage()
+		if err != nil {
+			panic(err)
+		}
+
+		sets := strings.Split(string(p), "\n")
+
+		for _, set_action := range sets {
+			action_decoded := set_cloud{}
+			err := json.Unmarshal([]byte(set_action), &action_decoded)
+			if err != nil {
+				panic(err)
+			}
+
+			if action_decoded.Method == "set" {
+				for i, cloud_var := range c.Variables {
+					if cloud_var.Name == action_decoded.Name {
+						c.Variables[i].Value = action_decoded.Value
+						f(cloud_var.Name, action_decoded.Value)
+					}
+				}
+			}
 		}
 	}
 }
