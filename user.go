@@ -3,7 +3,10 @@ package scratchgonnect
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 // Structs
@@ -124,6 +127,48 @@ func (u User) PostComment(session Session, content string, parent_id string, com
 	if err != nil || resp.StatusCode != 200 {
 		panic("Post comment failed! http response:" + to_string(resp.StatusCode))
 	}
+}
+
+func (u User) GetComments(page int) []Comment {
+	resp, err := http.Get("https://scratch.mit.edu/site-api/comments/user/" + u.Username + "/?page=" + to_string(page))
+	if err != nil {
+		panic(err)
+	}
+
+	decoded := []Comment{}
+
+	bodyBytes, _ := io.ReadAll(resp.Body)
+	body := string(bodyBytes)
+	comments := strings.Split(body, `<li class="top-level-reply">`)
+
+	for _, c_string := range comments {
+		elements := strings.Split(c_string, `<`)
+		id := scrape_element(elements[1], "data-comment-id")
+
+		if id != "" {
+			username := scrape_element(elements[4], "data-comment-user")
+			content := strings.Split(elements[12], `>`)[1]
+
+			int_id, err := strconv.Atoi(id)
+			if err != nil {
+				panic(err)
+			}
+
+			new_comment := Comment{
+				Id:      int_id,
+				Content: strings.TrimSpace(content),
+				Author: User{
+					Username: username,
+				},
+			}
+
+			decoded = append(decoded, new_comment)
+		}
+	}
+
+	json.NewDecoder(resp.Body).Decode(&decoded)
+
+	return decoded
 }
 
 // Functions

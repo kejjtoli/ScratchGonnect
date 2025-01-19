@@ -2,6 +2,7 @@ package scratchgonnect
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Base structs
@@ -34,4 +35,18 @@ type json_msgs struct {
 
 func to_string(v int) string {
 	return fmt.Sprintf("%d", v)
+}
+
+func scrape_element(el string, target string) string {
+	split := strings.Split(el, ` `)
+	for _, field := range split {
+		args := strings.Split(field, `=`)
+		if len(args) == 2 {
+			if args[0] == target {
+				return strings.Split(args[1], `"`)[1]
+			}
+		}
+	}
+
+	return ""
 }

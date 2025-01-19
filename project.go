@@ -154,6 +154,19 @@ func (p Project) GetRemixes() []Project {
 	return decoded
 }
 
+func (p Project) GetComments(offset int, limit int) []Comment {
+	resp, err := http.Get("https://api.scratch.mit.edu/users/" + p.Author.Username + "/projects/" + to_string(p.Id) + "/comments?offset=" + to_string(offset) + "&limit=" + to_string(limit))
+	if err != nil {
+		panic(err)
+	}
+
+	decoded := []Comment{}
+
+	json.NewDecoder(resp.Body).Decode(&decoded)
+
+	return decoded
+}
+
 // Functions
 
 func request_project_post(p Project, session Session, request string, rq string) (*http.Response, error) {

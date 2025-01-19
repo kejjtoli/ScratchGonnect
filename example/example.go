@@ -14,6 +14,7 @@ func start() {
 	user := scratchgonnect.GetUser("kajtolmation")
 	user.GetFollowers() // Returns an array of users
 	user.GetFollowing() // Returns an array of users
+	user.GetComments(1)
 
 	// Authentication required
 
@@ -38,6 +39,7 @@ func start() {
 	// Project structure
 	project := scratchgonnect.GetProject("535962801")
 	project.GetRemixes()
+	project.GetComments(0, 20)
 
 	// Authentication required
 
