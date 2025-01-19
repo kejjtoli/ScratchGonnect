@@ -167,7 +167,37 @@ func (p Project) GetComments(offset int, limit int) []Comment {
 	return decoded
 }
 
+func (project Project) Unshare(session Session) {
+	put_project_share(project, session, "unshare")
+}
+
+func (project Project) Share(session Session) {
+	put_project_share(project, session, "share")
+}
+
 // Functions
+
+func put_project_share(project Project, session Session, mode string) {
+	req, err := http.NewRequest("PUT", "https://api.scratch.mit.edu/proxy/projects/"+to_string(project.Id)+"/"+mode, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header = session.HttpHeader
+
+	req.Header.Set("referer", "https://scratch.mit.edu/projects/"+to_string(project.Id)+"/")
+	req.Header.Set("accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+
+	req.AddCookie(&session.Cookie)
+	req.AddCookie(&csrfCookieDefault)
+
+	resp, err := http.DefaultClient.Do(req)
+
+	if err != nil || (resp.StatusCode != 200 && !(resp.StatusCode == 503 && mode == "share")) {
+		panic("Share/unshare failed! http response:" + to_string(resp.StatusCode))
+	}
+}
 
 func request_project_post(p Project, session Session, request string, rq string) (*http.Response, error) {
 	req, err := http.NewRequest(rq, "https://api.scratch.mit.edu/proxy/projects/"+to_string(p.Id)+"/"+request+"/user/"+session.Username, *new(io.Reader))

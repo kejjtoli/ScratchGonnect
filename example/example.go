@@ -24,8 +24,10 @@ func start() {
 
 	// Studio structure
 	studio := scratchgonnect.GetStudio("34645019")
-	studio.GetCurators() // Returns an array of users
-	studio.GetManagers() // Returns an array of users
+	studio.GetCurators()      // Returns an array of users
+	studio.GetManagers()      // Returns an array of users
+	studio.GetComments(0, 20) // Returns list of comments
+	studio.GetProjects()      // Returns list of projects
 
 	// Authentication required
 
@@ -34,7 +36,6 @@ func start() {
 	studio.AddProject(*session, 535962801)      // Adds project to studio
 	studio.RemoveProject(*session, 535962801)   // Removes project from studio
 	studio.InviteUser(*session, "kajtolmation") // Invites user to studio
-	studio.GetComments(0, 20)                   // Returns list of comments
 
 	// Project structure
 	project := scratchgonnect.GetProject("535962801")
