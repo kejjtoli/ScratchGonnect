@@ -39,6 +39,7 @@ func start() {
 
 	// Project structure
 	project := scratchgonnect.GetProject("535962801")
+	project = scratchgonnect.GetHiddenProject(*session, "535962801") // For unshared projects, also works on shared projects
 	project.GetRemixes()
 	project.GetComments(0, 20)
 
@@ -50,6 +51,8 @@ func start() {
 	project.Favorite(*session)
 	project.Unlove(*session)
 	project.Unfavorite(*session)
+	project.Unshare(*session)
+	project.Share(*session)
 
 	// Explore page
 	scratchgonnect.GetExploreStudios("trending", "en") // Returns list of studios

@@ -185,17 +185,16 @@ func put_project_share(project Project, session Session, mode string) {
 
 	req.Header = session.HttpHeader
 
-	req.Header.Set("referer", "https://scratch.mit.edu/projects/"+to_string(project.Id)+"/")
-	req.Header.Set("accept", "application/json")
+	req.Header.Set("referer", "https://scratch.mit.edu/")
+	req.Header.Set("accept", "*/*")
 	req.Header.Set("Content-Type", "application/json")
 
 	req.AddCookie(&session.Cookie)
 	req.AddCookie(&csrfCookieDefault)
 
-	resp, err := http.DefaultClient.Do(req)
-
-	if err != nil || (resp.StatusCode != 200 && !(resp.StatusCode == 503 && mode == "share")) {
-		panic("Share/unshare failed! http response:" + to_string(resp.StatusCode))
+	_, err = http.DefaultClient.Do(req)
+	if err != nil {
+		panic("Share/unshare failed!")
 	}
 }
 
@@ -218,12 +217,37 @@ func request_project_post(p Project, session Session, request string, rq string)
 
 func GetProject(project string) *Project {
 	resp, err := http.Get("https://api.scratch.mit.edu/projects/" + project)
-	if err != nil {
-		panic(err)
+	if err != nil || resp.StatusCode != 200 {
+		panic("Get project failed! http response:" + to_string(resp.StatusCode))
 	}
 
 	response := new(Project)
 
+	json.NewDecoder(resp.Body).Decode(response)
+
+	return response
+}
+
+func GetHiddenProject(session Session, project string) *Project {
+	req, err := http.NewRequest("GET", "https://api.scratch.mit.edu/projects/"+project, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header = session.HttpHeader
+
+	req.Header.Set("accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+
+	req.AddCookie(&session.Cookie)
+	req.AddCookie(&csrfCookieDefault)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		panic("Get project failed! http response:" + to_string(resp.StatusCode))
+	}
+
+	response := new(Project)
 	json.NewDecoder(resp.Body).Decode(response)
 
 	return response
